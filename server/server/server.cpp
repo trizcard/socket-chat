@@ -9,17 +9,14 @@
 #include <chrono>
 
 using namespace std;
-#define grey "\033[0;37m"
-#define green "\033[0;32m"
-#define red "\033[0;31m"
-#define reset "\033[0m"
+
 
 Server::Server(int port) : port(port), nextClientId(1) {
     struct sockaddr_in serverAddr;
 
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
-        cerr << red << "Erro ao criar o socket" << reset << endl;
+        cerr << red << "Erro ao criar o socket" << RESET << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 
@@ -28,12 +25,12 @@ Server::Server(int port) : port(port), nextClientId(1) {
     serverAddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
-        cerr << red << "Erro ao associar o socket ao endereço" << reset << endl;
+        cerr << red << "Erro ao associar o socket ao endereço" << RESET << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 
     if (listen(serverSocket, MAX_CLIENTS) == -1) {
-        cerr << red << "Erro ao escutar por conexões" << reset << endl;
+        cerr << red << "Erro ao escutar por conexões" << RESET << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 }
@@ -62,7 +59,7 @@ void Server::HandleClient(int clientSocket, int clientId) {
         }
         std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
         std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-        cout << grey << std::ctime(&now_c) << reset;
+        cout << gray << std::ctime(&now_c);
 
         // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
         cout << "[" << clientName << "] " << buffer << endl;
@@ -71,7 +68,7 @@ void Server::HandleClient(int clientSocket, int clientId) {
         {
             ExecuteCommand(buffer, newUser);
         } else {
-            SendMessagesToAllClients(newUser, buffer);
+            SendMessagesToAllClients(newUser, buffer, std::ctime(&now_c));
         }
 
         // const char* response = "Mensagem recebida pelo servidor";
@@ -115,11 +112,11 @@ void Server::StartListening() {
     while (true) {
         int newSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
         if (newSocket == -1) {
-            cerr << red << "Erro ao aceitar a conexão" << reset << endl;
+            cerr << red << "Erro ao aceitar a conexão" << RESET << endl;
             continue;
         }
 
-        cout << green << "Conexão estabelecida com o cliente" << reset << endl;
+        cout << green << "Conexão estabelecida com o cliente" << RESET << endl;
 
         int clientId = nextClientId.fetch_add(1);
 
@@ -130,10 +127,10 @@ void Server::StartListening() {
     }
 }
 
-void Server::SendMessagesToAllClients(User hostUser, char *buffer)
+void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
 {
     // a mensagem é [CLIENTE X]: *mensagem*
-    string formattedMessage = "[" + hostUser.getName() + "]: " + buffer;
+    string formattedMessage = string(blue) + "[" + hostUser.getName() + "]    " + gray + time + lightGray + buffer + "\n" + RESET;
 
     for (User user : users)
     {

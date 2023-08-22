@@ -20,8 +20,7 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1)
     {
-        cerr << "Erro ao criar o socket" << endl;
-        // Pode lançar uma exceção aqui se preferir
+        cerr << red << "Erro ao criar o socket" << RESET << endl;
     }
 
     serverAddr.sin_family = AF_INET;
@@ -30,10 +29,11 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
 
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
     {
-        cerr << "Erro ao conectar ao servidor" << endl;
+        cerr << red << "Erro ao conectar ao servidor" << RESET << endl;
     }
 
     isConnected.store(true);
+    cout << green << "Conectado ao servidor" << RESET << endl;
 }
 
 Client::~Client()
@@ -67,11 +67,11 @@ void ListenThread(Client *client)
         if (bytesReceived <= 0)
         {
             client->setConnected(false);
-            cerr << "Conexão encerrada pelo servidor" << endl;
+            cerr << red << "Conexão encerrada pelo servidor" << RESET << endl;
             break;
         }
 
-        cout << buffer << endl;
+        cout << "\n" << buffer << endl;
     }
 }
 
@@ -79,7 +79,6 @@ void SendThread(Client *client)
 {
     while (client->getConnected())
     {
-        cout << "Digite uma mensagem para o servidor: ";
         string message;
         getline(cin, message);
 
@@ -89,7 +88,7 @@ void SendThread(Client *client)
 
 int main()
 {
-    const char *SERVER_IP = "192.168.0.23";
+    const char *SERVER_IP = "172.20.11.39";
     const int PORT = 8080;
 
     Client client(SERVER_IP, PORT);
