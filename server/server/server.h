@@ -31,8 +31,8 @@ public:
 
     void ExecuteCommand(std::string message, User user);
 
-    void ADMINmuteUser(int id);
-    void ADMINunmuteUser (int id);
+    void ADMINmuteUser(User user);
+    void ADMINunmuteUser (User user);
 private:
     int serverSocket;
     int port;

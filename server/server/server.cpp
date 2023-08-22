@@ -134,8 +134,9 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer)
             continue;
         }
 
-        // Não enviar a mensagem para clientes mutados
-        if (user.isMuted(hostUser.getId()) || generalMuteList.find(user.getId()) != generalMuteList.end())
+        // Não enviar a mensagem de clientes mutados
+        // TODO: arrumar /mute, o /muteall funciona
+        if (/*user.isMuted(hostUser.getId()) ||*/ generalMuteList.find(hostUser.getId()) != generalMuteList.end())
         {
             continue;
         }
@@ -148,9 +149,7 @@ void Server::ExecuteCommand(string message, User clientUser)
 {
     if (isCommand(message, "/mute"))
     {
-        cout << "Mute command" << endl;
         vector<string> usernames = extractUsernames(message);
-        cout << "Usernames extracted" << usernames.at(0) << endl;
 
         bool found = false;
         string username = usernames.at(0);
@@ -159,7 +158,7 @@ void Server::ExecuteCommand(string message, User clientUser)
         {
             if (user.getName() == username)
             {
-                clientUser.muteUser(user.getId());
+                clientUser.muteUser(user);
                 found = true;
                 break;
             }
@@ -180,13 +179,13 @@ void Server::ExecuteCommand(string message, User clientUser)
             {
                 if (user.getName() == username)
                 {
-                    clientUser.unmuteUser(user.getId());
+                    clientUser.unmuteUser(user);
                     break;
                 }
             }
         }
     }
-    else if (isCommand(message, "/muteall"))
+    else if (isCommand(message, "/adminmute"))
     {
         std::vector<std::string> usernames = extractUsernames(message);
         for (std::string username : usernames)
@@ -195,13 +194,13 @@ void Server::ExecuteCommand(string message, User clientUser)
             {
                 if (user.getName() == username)
                 {
-                    ADMINmuteUser(user.getId());
+                    ADMINmuteUser(user);
                     break;
                 }
             }
         }
     }
-    else if (isCommand(message, "/unmuteall"))
+    else if (isCommand(message, "/adminunmute"))
     {
         std::vector<std::string> usernames = extractUsernames(message);
         for (std::string username : usernames)
@@ -210,7 +209,7 @@ void Server::ExecuteCommand(string message, User clientUser)
             {
                 if (user.getName() == username)
                 {
-                    ADMINunmuteUser(user.getId());
+                    ADMINunmuteUser(user);
                     break;
                 }
             }
@@ -218,20 +217,21 @@ void Server::ExecuteCommand(string message, User clientUser)
     }
 }
 
-void Server::ADMINmuteUser (int id) {
-    generalMuteList.insert(id);
+void Server::ADMINmuteUser(User userToMute) {
+    generalMuteList.insert(userToMute.getId());
 
-    std::string adminMessage = "User " + std::to_string(id) + " has been muted by the admin.";
+    std::string adminMessage = "User " + userToMute.getName() + " has been muted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);
     }
 }
 
-void Server::ADMINunmuteUser (int id) {
-    generalMuteList.erase(id);
+void Server::ADMINunmuteUser(User userToUnmute)
+{
+    generalMuteList.erase(userToUnmute.getId());
 
-    std::string adminMessage = "User " + std::to_string(id) + " has been unmuted by the admin.";
+    std::string adminMessage = "User " + userToUnmute.getName() + " has been unmuted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);

@@ -19,9 +19,9 @@ public:
     void setName(std::string name);
     void setClientSocket(int clientSocket);
 
-    void muteUser(int id);
-    void unmuteUser(int id);
-    bool isMuted(int id);
+    void muteUser(User user);
+    void unmuteUser(User user);
+    bool isMuted(User user);
 private:
     int id;;
     std::string name;

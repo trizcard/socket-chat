@@ -58,19 +58,19 @@ void User::setClientSocket(int clientSocket)
     this->clientSocket = clientSocket;
 }
 
-// ==============================N
+// ==============================
 
-void User::muteUser(int id)
+void User::muteUser(User user)
 {
-    this->muteList.insert(id);
+    this->muteList.insert(user.getId());
 }
 
-void User::unmuteUser(int id)
+void User::unmuteUser(User user)
 {
-    this->muteList.erase(id);
+    this->muteList.erase(user.getId());
 }
 
-bool User::isMuted(int id)
+bool User::isMuted(User user)
 {
-    return this->muteList.find(id) != this->muteList.end();
+    return this->muteList.find(user.getId()) != this->muteList.end();
 }
