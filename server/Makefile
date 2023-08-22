@@ -25,6 +25,8 @@ $(BUILD_DIR)/$(TARGET): $(OBJS) main.cpp
 $(BUILD_DIR)/%.o: */%.cpp */%.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+run:
+	./$(BUILD_DIR)/$(TARGET)
+
 clean:
 	rm -rf $(BUILD_DIR)
-

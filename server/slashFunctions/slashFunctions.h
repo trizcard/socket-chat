@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 
+bool isAnyCommand(const std::string &message);
 bool isCommand(const std::string &message, const std::string &command);
 
 std::vector<std::string> extractUsernames(const std::string &message);

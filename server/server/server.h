@@ -29,7 +29,7 @@ public:
     void SendMessagesToAllClients(User user, char *buffer);
     void clientDisconnect(User user);
 
-    void ExecuteCommands(std::string message, User user);
+    void ExecuteCommand(std::string message, User user);
 
     void ADMINmuteUser(int id);
     void ADMINunmuteUser (int id);

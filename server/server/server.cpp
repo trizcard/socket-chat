@@ -58,12 +58,15 @@ void Server::HandleClient(int clientSocket, int clientId) {
         // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
         cout << "[" << clientName << "] " << buffer << endl;
 
-        ExecuteCommands(buffer, newUser);
+        if (isAnyCommand(buffer))
+        {
+            ExecuteCommand(buffer, newUser);
+        } else {
+            SendMessagesToAllClients(newUser, buffer);
+        }
 
-        SendMessagesToAllClients(newUser, buffer);
-
-        const char* response = "Mensagem recebida pelo servidor";
-        send(clientSocket, response, strlen(response), 0);
+        // const char* response = "Mensagem recebida pelo servidor";
+        // send(clientSocket, response, strlen(response), 0);
     }
 
     close(clientSocket);
@@ -141,21 +144,31 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer)
     }
 }
 
-void Server::ExecuteCommands(string message, User clientUser)
+void Server::ExecuteCommand(string message, User clientUser)
 {
     if (isCommand(message, "/mute"))
     {
+        cout << "Mute command" << endl;
         vector<string> usernames = extractUsernames(message);
-        for (string username : usernames)
+        cout << "Usernames extracted" << usernames.at(0) << endl;
+
+        bool found = false;
+        string username = usernames.at(0);
+
+        for (User user : users)
         {
-            for (User user : users)
+            if (user.getName() == username)
             {
-                if (user.getName() == username)
-                {
-                    clientUser.muteUser(user.getId());
-                    break;
-                }
+                clientUser.muteUser(user.getId());
+                found = true;
+                break;
             }
+        }
+
+        if (!found)
+        {
+            // TODO: send error message
+            cout << "User " << username << " not found" << endl;
         }
     }
     else if (isCommand(message, "/unmute"))

@@ -4,6 +4,11 @@
 #include <vector>
 #include "slashFunctions.h"
 
+bool isAnyCommand(const std::string &message)
+{
+    return !message.empty() && message[0] == '/';
+}
+
 bool isCommand(const std::string &message, const std::string &command)
 {
     if (message.size() < command.size())
