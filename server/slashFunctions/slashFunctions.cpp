@@ -1,5 +1,6 @@
 #include <string>
 #include <set>
+#include "slashFunctions.h"
 
 bool isCommand(const std::string &message, const std::string &command)
 {
@@ -23,11 +24,4 @@ bool isCommand(const std::string &message, const std::string &command)
     }
 
     return true;
-}
-
-// mute user by id, add to mute list
-int ADMINmuteUser (int id, std::set<int> &muteList)
-{
-    muteList.insert(id);
-    return 0;
 }

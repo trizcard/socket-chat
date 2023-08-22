@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 using namespace std;
 
@@ -35,10 +36,29 @@ Server::~Server() {
     close(serverSocket);
 }
 
+string Server::GetClientIP(int clientSocket)
+{
+    struct sockaddr_in clientAddr;
+    socklen_t addrLen = sizeof(clientAddr);
+
+    if (getpeername(clientSocket, (struct sockaddr *)&clientAddr, &addrLen) == 0)
+    {
+        return inet_ntoa(clientAddr.sin_addr);
+    }
+
+    return "Unknown"; // Return "Unknown" if IP retrieval fails
+}
+
 void Server::HandleClient(int clientSocket, int clientId) {
     char buffer[BUFFER_SIZE] = {0};
 
     string clientName = "Cliente " + to_string(clientId);
+    User newUser = User(clientId, clientSocket, GetClientIP(clientId), clientName);
+
+    {
+        lock_guard<mutex> lock(threadPoolMutex);
+        users.push_back(newUser);
+    }
 
     while (true) {
         memset(buffer, 0, sizeof(buffer));
@@ -50,10 +70,36 @@ void Server::HandleClient(int clientSocket, int clientId) {
                 nextClientId.store(1);
             }
 
+            {
+                std::lock_guard<std::mutex> lock(threadPoolMutex);
+                for (auto it = users.begin(); it != users.end(); ++it)
+                {
+                    if (it->getId() == clientId)
+                    {
+                        users.erase(it);
+                        break; // Assuming each client has a unique ID, you can exit the loop once found
+                    }
+                }
+            }
+
             break;
         }
 
         cout << clientName << ": " << buffer << endl;
+
+        for (User user : users) {
+            // Não enviar a mensagem para o próprio cliente
+            if (user.getId() == clientId) {
+                continue;
+            }
+
+            // Não enviar a mensagem para clientes mutados
+            if (user.isMuted(clientId) || generalMuteList.find(user.getId()) != generalMuteList.end()) {
+                continue;
+            }
+
+            send(user.getClientSocket(), buffer, bytesReceived, 0);
+        }
 
         const char* response = "Mensagem recebida pelo servidor";
         send(clientSocket, response, strlen(response), 0);
@@ -70,6 +116,8 @@ void Server::HandleClient(int clientSocket, int clientId) {
 void Server::StartListening() {
     struct sockaddr_in clientAddr;
     socklen_t addrLen = sizeof(clientAddr);
+
+    cout << "Servidor escutando na porta " << port << endl;
 
     while (true) {
         int newSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
@@ -91,16 +139,20 @@ void Server::StartListening() {
 
 void Server::ADMINmuteUser (int id) {
     generalMuteList.insert(id);
+
+    std::string adminMessage = "User " + std::to_string(id) + " has been muted by the admin.";
+    for (User user : users)
+    {
+        send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);
+    }
 }
 
 void Server::ADMINunmuteUser (int id) {
     generalMuteList.erase(id);
-}
 
-void Server::muteUser (MuteData muteData) {
-    userMuteList.insert(muteData);
-}
-
-void Server::unmuteUser (MuteData muteData) {
-    userMuteList.erase(muteData);
+    std::string adminMessage = "User " + std::to_string(id) + " has been unmuted by the admin.";
+    for (User user : users)
+    {
+        send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);
+    }
 }
