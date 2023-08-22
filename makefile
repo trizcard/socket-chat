@@ -1,8 +1,8 @@
 CC = g++
 CFLAGS = -std=c++11 -Wall
 
-SERVER_SOURCES = server.cpp server_main.cpp
-CLIENT_SOURCES = client.cpp client_main.cpp
+SERVER_SOURCES = server.cpp
+CLIENT_SOURCES = client.cpp
 
 SERVER_OBJECTS = $(SERVER_SOURCES:.cpp=.o)
 CLIENT_OBJECTS = $(CLIENT_SOURCES:.cpp=.o)
