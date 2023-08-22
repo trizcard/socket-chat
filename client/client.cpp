@@ -10,12 +10,19 @@ using namespace std;
 
 const int BUFFER_SIZE = 1024;
 
+// define colors red, violet and green for the output
+#define red "\033[0;31m"
+#define violet "\033[0;35m"
+#define grey "\033[0;37m"
+#define green "\033[0;32m"
+#define reset "\033[0m"
+
 Client::Client(const char* serverIP, int port) : serverIP(serverIP), port(port) {
     struct sockaddr_in serverAddr;
 
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
-        cerr << "Erro ao criar o socket" << endl;
+        cerr << red << "Erro ao criar o socket" << reset << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 
@@ -24,7 +31,7 @@ Client::Client(const char* serverIP, int port) : serverIP(serverIP), port(port) 
     inet_pton(AF_INET, serverIP, &serverAddr.sin_addr);
 
     if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
-        cerr << "Erro ao conectar ao servidor" << endl;
+        cerr << red << "Erro ao conectar ao servidor" << reset << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 }
@@ -36,10 +43,10 @@ Client::~Client() {
 void Client::ConnectAndCommunicate() {
     char buffer[BUFFER_SIZE] = {0};
 
-    cout << "Conexão estabelecida com o servidor" << endl;
+    cout << green << "Conexão estabelecida com o servidor" << reset << endl;
 
     while (true) {
-        cout << "Digite uma mensagem para o servidor: ";
+        cout << grey << "Digite uma mensagem para o servidor: ";
         string message;
         getline(cin, message);
 
@@ -59,6 +66,7 @@ void Client::ConnectAndCommunicate() {
 int main() {
     const char* SERVER_IP = "172.20.11.39";
     const int PORT = 8080;
+
     Client client(SERVER_IP, PORT);
     client.ConnectAndCommunicate();
     return 0;
