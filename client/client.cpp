@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+using namespace std;
+
 const int BUFFER_SIZE = 1024;
 
 Client::Client(const char* serverIP, int port) : serverIP(serverIP), port(port) {
@@ -13,7 +15,7 @@ Client::Client(const char* serverIP, int port) : serverIP(serverIP), port(port) 
 
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1) {
-        std::cerr << "Erro ao criar o socket" << std::endl;
+        cerr << "Erro ao criar o socket" << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 
@@ -22,7 +24,7 @@ Client::Client(const char* serverIP, int port) : serverIP(serverIP), port(port) 
     inet_pton(AF_INET, serverIP, &serverAddr.sin_addr);
 
     if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
-        std::cerr << "Erro ao conectar ao servidor" << std::endl;
+        cerr << "Erro ao conectar ao servidor" << endl;
         // Pode lançar uma exceção aqui se preferir
     }
 }
@@ -34,23 +36,23 @@ Client::~Client() {
 void Client::ConnectAndCommunicate() {
     char buffer[BUFFER_SIZE] = {0};
 
-    std::cout << "Conexão estabelecida com o servidor" << std::endl;
+    cout << "Conexão estabelecida com o servidor" << endl;
 
     while (true) {
-        std::cout << "Digite uma mensagem para o servidor: ";
-        std::string message;
-        std::getline(std::cin, message);
+        cout << "Digite uma mensagem para o servidor: ";
+        string message;
+        getline(cin, message);
 
         send(clientSocket, message.c_str(), message.length(), 0);
 
         memset(buffer, 0, sizeof(buffer));
         int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesReceived <= 0) {
-            std::cerr << "Conexão encerrada pelo servidor" << std::endl;
+            cerr << "Conexão encerrada pelo servidor" << endl;
             break;
         }
 
-        std::cout << "Servidor: " << buffer << std::endl;
+        cout << "Servidor: " << buffer << endl;
     }
 }
 
