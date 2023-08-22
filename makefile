@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -Wall
+CFLAGS = -std=c++11 -Wall -pthread
 
 SERVER_SOURCES = server.cpp
 CLIENT_SOURCES = client.cpp
