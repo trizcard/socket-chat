@@ -1,5 +1,7 @@
 #include <string>
 #include <set>
+#include <sstream>
+#include <vector>
 #include "slashFunctions.h"
 
 bool isCommand(const std::string &message, const std::string &command)
@@ -24,4 +26,22 @@ bool isCommand(const std::string &message, const std::string &command)
     }
 
     return true;
+}
+
+std::vector<std::string> extractUsernames(const std::string &message)
+{
+    std::vector<std::string> usernames;
+    std::istringstream iss(message);
+    std::string token;
+
+    // Skip the command itself
+    iss >> token;
+
+    // Extract usernames
+    while (iss >> token)
+    {
+        usernames.push_back(token);
+    }
+
+    return usernames;
 }

@@ -9,6 +9,7 @@
 #include <condition_variable>
 
 #include "../user/user.h"
+#include "../slashFunctions/slashFunctions.h"
 
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 5
@@ -25,7 +26,12 @@ public:
 
     void StartListening();
 
-    void ADMINmuteUser (int id);
+    void SendMessagesToAllClients(User user, char *buffer);
+    void clientDisconnect(User user);
+
+    void ExecuteCommands(std::string message, User user);
+
+    void ADMINmuteUser(int id);
     void ADMINunmuteUser (int id);
 private:
     int serverSocket;
@@ -44,7 +50,6 @@ private:
 
     // Função para a thread do cliente
     void HandleClient(int clientSocket, int clientId);
-    std::string GetClientIP(int clientSocket);
 };
 
 #endif // SERVER_H

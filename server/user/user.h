@@ -6,18 +6,16 @@
 
 class User {
 public:
-    User(int id, int socket, std::string ip, std::string name);
-    User(int id, std::string ip, std::string name);
-    User(int id, std::string ip);
+    User(int id, int socket, std::string name);
+    User(int id, std::string name);
+    User(int id);
     ~User();
 
     int getId();
-    std::string getIp();
     std::string getName();
     int getClientSocket();
 
     void setId(int id);
-    void setIp(std::string ip);
     void setName(std::string name);
     void setClientSocket(int clientSocket);
 
@@ -25,8 +23,7 @@ public:
     void unmuteUser(int id);
     bool isMuted(int id);
 private:
-    int id;
-    std::string ip;
+    int id;;
     std::string name;
     int clientSocket;
     std::set<int> muteList;

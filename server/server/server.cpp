@@ -36,24 +36,11 @@ Server::~Server() {
     close(serverSocket);
 }
 
-string Server::GetClientIP(int clientSocket)
-{
-    struct sockaddr_in clientAddr;
-    socklen_t addrLen = sizeof(clientAddr);
-
-    if (getpeername(clientSocket, (struct sockaddr *)&clientAddr, &addrLen) == 0)
-    {
-        return inet_ntoa(clientAddr.sin_addr);
-    }
-
-    return "Unknown"; // Return "Unknown" if IP retrieval fails
-}
-
 void Server::HandleClient(int clientSocket, int clientId) {
     char buffer[BUFFER_SIZE] = {0};
 
-    string clientName = "Cliente " + to_string(clientId);
-    User newUser = User(clientId, clientSocket, GetClientIP(clientId), clientName);
+    string clientName = "CLIENTE_" + to_string(clientId);
+    User newUser = User(clientId, clientSocket, clientName);
 
     {
         lock_guard<mutex> lock(threadPoolMutex);
@@ -64,42 +51,16 @@ void Server::HandleClient(int clientSocket, int clientId) {
         memset(buffer, 0, sizeof(buffer));
         int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesReceived <= 0) {
-            cerr << clientName << " desconectou" << endl;
-
-            if (clientId == 1) {
-                nextClientId.store(1);
-            }
-
-            {
-                std::lock_guard<std::mutex> lock(threadPoolMutex);
-                for (auto it = users.begin(); it != users.end(); ++it)
-                {
-                    if (it->getId() == clientId)
-                    {
-                        users.erase(it);
-                        break; // Assuming each client has a unique ID, you can exit the loop once found
-                    }
-                }
-            }
-
+            clientDisconnect(newUser);
             break;
         }
 
-        cout << clientName << ": " << buffer << endl;
+        // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
+        cout << "[" << clientName << "] " << buffer << endl;
 
-        for (User user : users) {
-            // Não enviar a mensagem para o próprio cliente
-            if (user.getId() == clientId) {
-                continue;
-            }
+        ExecuteCommands(buffer, newUser);
 
-            // Não enviar a mensagem para clientes mutados
-            if (user.isMuted(clientId) || generalMuteList.find(user.getId()) != generalMuteList.end()) {
-                continue;
-            }
-
-            send(user.getClientSocket(), buffer, bytesReceived, 0);
-        }
+        SendMessagesToAllClients(newUser, buffer);
 
         const char* response = "Mensagem recebida pelo servidor";
         send(clientSocket, response, strlen(response), 0);
@@ -112,6 +73,26 @@ void Server::HandleClient(int clientSocket, int clientId) {
     }
 }
 
+void Server::clientDisconnect(User user) {
+    cerr << user.getName() << " desconectou" << endl;
+
+    if (user.getId() == 1)
+    {
+        nextClientId.store(1);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(threadPoolMutex);
+        for (auto it = users.begin(); it != users.end(); ++it)
+        {
+            if (it->getId() == user.getId())
+            {
+                users.erase(it);
+                break; // Assuming each client has a unique ID, you can exit the loop once found
+            }
+        }
+    }
+}
 
 void Server::StartListening() {
     struct sockaddr_in clientAddr;
@@ -134,6 +115,93 @@ void Server::StartListening() {
         cv.wait(lock, [this] { return threadPool.size() < MAX_CLIENTS; });
 
         threadPool.emplace_back(&Server::HandleClient, this, newSocket, clientId);
+    }
+}
+
+void Server::SendMessagesToAllClients(User hostUser, char *buffer)
+{
+    // a mensagem é [CLIENTE X]: *mensagem*
+    string formattedMessage = "[" + hostUser.getName() + "]: " + buffer;
+
+    for (User user : users)
+    {
+        // Não enviar a mensagem para o próprio cliente
+        if (user.getId() == hostUser.getId())
+        {
+            continue;
+        }
+
+        // Não enviar a mensagem para clientes mutados
+        if (user.isMuted(hostUser.getId()) || generalMuteList.find(user.getId()) != generalMuteList.end())
+        {
+            continue;
+        }
+
+        send(user.getClientSocket(), formattedMessage.c_str(), formattedMessage.length(), 0);
+    }
+}
+
+void Server::ExecuteCommands(string message, User clientUser)
+{
+    if (isCommand(message, "/mute"))
+    {
+        vector<string> usernames = extractUsernames(message);
+        for (string username : usernames)
+        {
+            for (User user : users)
+            {
+                if (user.getName() == username)
+                {
+                    clientUser.muteUser(user.getId());
+                    break;
+                }
+            }
+        }
+    }
+    else if (isCommand(message, "/unmute"))
+    {
+        std::vector<std::string> usernames = extractUsernames(message);
+        for (std::string username : usernames)
+        {
+            for (User user : users)
+            {
+                if (user.getName() == username)
+                {
+                    clientUser.unmuteUser(user.getId());
+                    break;
+                }
+            }
+        }
+    }
+    else if (isCommand(message, "/muteall"))
+    {
+        std::vector<std::string> usernames = extractUsernames(message);
+        for (std::string username : usernames)
+        {
+            for (User user : users)
+            {
+                if (user.getName() == username)
+                {
+                    ADMINmuteUser(user.getId());
+                    break;
+                }
+            }
+        }
+    }
+    else if (isCommand(message, "/unmuteall"))
+    {
+        std::vector<std::string> usernames = extractUsernames(message);
+        for (std::string username : usernames)
+        {
+            for (User user : users)
+            {
+                if (user.getName() == username)
+                {
+                    ADMINunmuteUser(user.getId());
+                    break;
+                }
+            }
+        }
     }
 }
 
