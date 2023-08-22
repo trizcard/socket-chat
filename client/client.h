@@ -1,5 +1,7 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef __CLIENT_H__
+#define __CLIENT_H__
+
+#include <atomic>
 
 class Client {
 public:
@@ -7,11 +9,14 @@ public:
     ~Client();
 
     void ConnectAndCommunicate();
-
+    int getClientSocket();
+    void setConnected(bool connected);
+    bool getConnected();
 private:
     int clientSocket;
     const char* serverIP;
     int port;
+    std::atomic<bool> isConnected;
 };
 
 #endif // CLIENT_H
