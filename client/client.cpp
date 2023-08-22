@@ -57,7 +57,7 @@ void Client::ConnectAndCommunicate() {
 }
 
 int main() {
-    const char* SERVER_IP = "172.20.11.39";
+    const char *SERVER_IP = "192.168.0.23";
     const int PORT = 8080;
     Client client(SERVER_IP, PORT);
     client.ConnectAndCommunicate();
