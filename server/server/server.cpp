@@ -7,9 +7,6 @@
 
 using namespace std;
 
-const int BUFFER_SIZE = 1024;
-const int MAX_CLIENTS = 5;
-
 Server::Server(int port) : port(port), nextClientId(1) {
     struct sockaddr_in serverAddr;
 
@@ -92,10 +89,18 @@ void Server::StartListening() {
     }
 }
 
-int main() {
-    const int PORT = 8080;
-    Server server(PORT);
-    server.StartListening();
+void Server::ADMINmuteUser (int id) {
+    generalMuteList.insert(id);
+}
 
-    return 0;
+void Server::ADMINunmuteUser (int id) {
+    generalMuteList.erase(id);
+}
+
+void Server::muteUser (MuteData muteData) {
+    userMuteList.insert(muteData);
+}
+
+void Server::unmuteUser (MuteData muteData) {
+    userMuteList.erase(muteData);
 }
