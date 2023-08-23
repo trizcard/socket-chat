@@ -13,6 +13,7 @@ const int BUFFER_SIZE = 1024;
 
 Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
 {
+
     struct sockaddr_in serverAddr;
     isConnected.store(false);
 
@@ -90,6 +91,7 @@ int main()
 {
     const char *SERVER_IP = "192.168.0.23";
     const int PORT = 8080;
+
     Client client(SERVER_IP, PORT);
 
     thread listenThread(ListenThread, &client);
