@@ -2,11 +2,14 @@
 #ifdef __SLASHFUNCTIONS_H__
 
 #include <string>
-#include <set>
+#include <sstream>
+#include <vector>
 
+bool isAnyCommand(const std::string &message);
 bool isCommand(const std::string &message, const std::string &command);
 
+std::vector<std::string> extractUsernames(const std::string &message);
+
 // mute user by id, add to mute list
-int ADMINmuteUser (int id, std::set<int> &muteList);
 
 #endif // __SLASHFUNCTIONS_H__

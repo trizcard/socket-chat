@@ -1,5 +1,13 @@
 #include <string>
 #include <set>
+#include <sstream>
+#include <vector>
+#include "slashFunctions.h"
+
+bool isAnyCommand(const std::string &message)
+{
+    return !message.empty() && message[0] == '/';
+}
 
 bool isCommand(const std::string &message, const std::string &command)
 {
@@ -25,9 +33,20 @@ bool isCommand(const std::string &message, const std::string &command)
     return true;
 }
 
-// mute user by id, add to mute list
-int ADMINmuteUser (int id, std::set<int> &muteList)
+std::vector<std::string> extractUsernames(const std::string &message)
 {
-    muteList.insert(id);
-    return 0;
+    std::vector<std::string> usernames;
+    std::istringstream iss(message);
+    std::string token;
+
+    // Skip the command itself
+    iss >> token;
+
+    // Extract usernames
+    while (iss >> token)
+    {
+        usernames.push_back(token);
+    }
+
+    return usernames;
 }

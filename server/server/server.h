@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef __SERVER_H__
+#define __SERVER_H__
 
 #include <thread>
 #include <vector>
@@ -8,8 +8,11 @@
 #include <atomic>
 #include <condition_variable>
 
-#define BUFFER_SIZE 1024;
-#define MAX_CLIENTS 5;
+#include "../user/user.h"
+#include "../slashFunctions/slashFunctions.h"
+
+#define BUFFER_SIZE 1024
+#define MAX_CLIENTS 5
 
 typedef struct muteData {
     int mutedById;
@@ -23,12 +26,13 @@ public:
 
     void StartListening();
 
-    void ADMINmuteUser (int id);
-    void ADMINunmuteUser (int id);
+    void SendMessagesToAllClients(User user, char *buffer);
+    void clientDisconnect(User user);
 
-    void muteUser (muteData muteData);
-    void unmuteUser (muteData muteData);
+    void ExecuteCommand(std::string message, User user);
 
+    void ADMINmuteUser(User user);
+    void ADMINunmuteUser (User user);
 private:
     int serverSocket;
     int port;
@@ -39,10 +43,10 @@ private:
     std::condition_variable cv;
 
     std::set<int> generalMuteList;
-    std::set<MuteData> userMuteList;
 
     // Variável para manter o número do próximo cliente
     std::atomic<int> nextClientId;
+    std::vector<User> users;
 
     // Função para a thread do cliente
     void HandleClient(int clientSocket, int clientId);
