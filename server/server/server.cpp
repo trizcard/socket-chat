@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <ctime>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 
@@ -32,6 +33,14 @@ Server::Server(int port) : port(port), nextClientId(1) {
     if (listen(serverSocket, MAX_CLIENTS) == -1) {
         cerr << red << "Erro ao escutar por conexões" << RESET << endl;
         // Pode lançar uma exceção aqui se preferir
+    }
+
+    // Open file to write
+    std::ofstream outputFile(filename);
+    if (outputFile.is_open()) {
+        outputFile.close();
+    } else {
+        cerr << red << "Não foi possível criar o arquivo." << RESET << endl;
     }
 }
 
@@ -63,6 +72,15 @@ void Server::HandleClient(int clientSocket, int clientId) {
 
         // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
         cout << "[" << clientName << "] " << buffer << endl;
+
+        std::ifstream inputFile(filename);
+        if (inputFile.is_open()) {
+            inputFile << string(std::ctime(&now_c));
+            inputFile << "[" << clientName << "] " << buffer;
+            inputFile.close();
+        } else {
+            std::cout << "Não foi possível abrir o arquivo." << std::endl;
+        }
 
         if (isAnyCommand(buffer))
         {
@@ -132,6 +150,14 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     // a mensagem é [CLIENTE X]: *mensagem*
     string formattedMessage = string(blue) + "[" + hostUser.getName() + "]    " + gray + time + lightGray + buffer + "\n" + RESET;
 
+    std::ifstream inputFile(filename);
+    if (inputFile.is_open()) {
+        std::cout << formattedMessage << std::endl;
+        inputFile.close();
+    } else {
+        std::cout << "Não foi possível abrir o arquivo." << std::endl;
+    }
+
     for (User user : users)
     {
         // Não enviar a mensagem para o próprio cliente
@@ -173,7 +199,7 @@ void Server::ExecuteCommand(string message, User clientUser)
         if (!found)
         {
             // TODO: send error message
-            cout << "User " << username << " not found" << endl;
+            cout << red << "User " << username << " not found" << endl;
         }
     }
     else if (isCommand(message, "/unmute"))
@@ -226,7 +252,7 @@ void Server::ExecuteCommand(string message, User clientUser)
 void Server::ADMINmuteUser(User userToMute) {
     generalMuteList.insert(userToMute.getId());
 
-    std::string adminMessage = "User " + userToMute.getName() + " has been muted by the admin.";
+    std::string adminMessage = string(yellow) + "User " + userToMute.getName() + " has been muted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);
@@ -237,7 +263,7 @@ void Server::ADMINunmuteUser(User userToUnmute)
 {
     generalMuteList.erase(userToUnmute.getId());
 
-    std::string adminMessage = "User " + userToUnmute.getName() + " has been unmuted by the admin.";
+    std::string adminMessage = string(yellow) + "User " + userToUnmute.getName() + " has been unmuted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);

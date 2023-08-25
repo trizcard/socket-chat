@@ -19,6 +19,7 @@
 #define gray "\033[1;90m"
 #define lightGray "\033[0;37m"
 #define blue "\033[1;94m"
+#define yellow "\033[1;93m"
 
 #define RESET "\033[1;97m"
 
@@ -44,6 +45,8 @@ public:
 private:
     int serverSocket;
     int port;
+    
+    const std::string& filename = "chat.txt";
 
     // Pool de threads e mutex
     std::vector<std::thread> threadPool;
