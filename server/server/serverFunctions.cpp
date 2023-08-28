@@ -27,12 +27,32 @@ void Server::ExecuteCommand(string message, User& clientUser)
             return;
         }
 
-        lock_guard<mutex> lock(threadPoolMutex);
+        {
+            lock_guard<mutex> lock(threadPoolMutex);
+            for (User& user : users)
+            {
+                if (user.getId() == clientUser.getId())
+                {
+                    user.setName(newName);
+                    break;
+                }
+            }
+        }
 
         clientUser.setName(newName);
-        this->SendSingleMessage(colorString("Nome de usuário alterado para " + newName, green), clientUser);
+        cout << "CLIENTE_" << clientUser.getId() << " changed name to " << clientUser.getName() << endl;
+        return;
     }
-    else if (isCommand(message, "/help"))
+    else if (isCommand(message, "/help")){
+        this->SendSingleMessage(colorString("Comandos disponíveis:\n"
+                                            "/changename <new_name> - Altera o nome de usuário\n"
+                                            "/mute <username> - Muta um usuário\n"
+                                            "/unmute <username> - Desmuta um usuário\n"
+                                            "/adminmute <username> - Muta um usuário para todos\n"
+                                            "/adminunmute <username> - Desmuta um usuário para todos\n"
+                                            "/help - Mostra os comandos disponíveis", yellow), clientUser);
+        return;
+    }
 
     vector<User> users;
 
@@ -62,6 +82,7 @@ void Server::ExecuteCommand(string message, User& clientUser)
         }
 
         clientUser.muteUser(searchedUser);
+        return;
     }
     else if (isCommand(message, "/unmute") && mustHaveUserInput(users, 1, clientUser))
     {
@@ -74,6 +95,7 @@ void Server::ExecuteCommand(string message, User& clientUser)
         }
 
         clientUser.unmuteUser(searchedUser);
+        return;
     }
     else if (isCommand(message, "/adminmute") && mustHaveUserInput(users, 1, clientUser))
     {
@@ -86,6 +108,7 @@ void Server::ExecuteCommand(string message, User& clientUser)
         }
 
         ADMINmuteUser(searchedUser);
+        return;
     }
     else if (isCommand(message, "/adminunmute") && mustHaveUserInput(users, 1, clientUser))
     {
@@ -98,6 +121,7 @@ void Server::ExecuteCommand(string message, User& clientUser)
         }
 
         ADMINunmuteUser(searchedUser);
+        return;
     }
     else
     {

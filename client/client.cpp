@@ -93,7 +93,7 @@ void SendThread(Client *client)
 
 int main()
 {
-    const char *SERVER_IP = "172.20.26.81";
+    const char *SERVER_IP = "192.168.0.252";
     const int PORT = 8080;
 
     Client client(SERVER_IP, PORT);
