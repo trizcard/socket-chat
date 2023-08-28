@@ -83,13 +83,17 @@ void SendThread(Client *client)
         string message;
         getline(cin, message);
 
+        // apaga a linha recem digitada
+        cout << "\x1b[1F"
+             << "\x1b[2K";
+
         send(client->getClientSocket(), message.c_str(), message.length(), 0);
     }
 }
 
 int main()
 {
-    const char *SERVER_IP = "172.20.11.39";
+    const char *SERVER_IP = "172.20.26.81";
     const int PORT = 8080;
 
     Client client(SERVER_IP, PORT);
