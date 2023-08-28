@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <thread> // Include for threads
+#include <thread>
 
 using namespace std;
 
@@ -30,6 +30,7 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
     {
         cerr << red << "Erro ao conectar ao servidor" << RESET << endl;
+        return;
     }
 
     isConnected.store(true);
@@ -60,7 +61,7 @@ void ListenThread(Client *client)
 {
     char buffer[BUFFER_SIZE] = {0};
 
-    while (true)
+    while (client->getConnected())
     {
         memset(buffer, 0, sizeof(buffer));
         int bytesReceived = recv(client->getClientSocket(), buffer, sizeof(buffer), 0);
