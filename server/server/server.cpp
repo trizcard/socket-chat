@@ -37,18 +37,6 @@ Server::Server(int port) : port(port), nextClientId(1)
         printServerError("Erro ao escutar por conexões");
         return;
     }
-
-    // Open file to write
-    outputFile.open(filename);
-    if (outputFile.is_open())
-    {
-        outputFile << "Chat do servidor \n"
-                   << endl;
-    }
-    else
-    {
-        printServerError("Não foi possível criar o arquivo");
-    }
 }
 
 Server::~Server()

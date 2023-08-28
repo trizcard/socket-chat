@@ -44,9 +44,6 @@ private:
     int serverSocket;
     int port;
 
-    const std::string& filename = "chat.txt";
-    std::ofstream outputFile;
-
     // Pool de threads e mutex
     std::vector<std::thread> threadPool;
     std::mutex threadPoolMutex;
