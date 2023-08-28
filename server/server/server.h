@@ -7,6 +7,7 @@
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
+#include <fstream>
 
 #include "../user/user.h"
 #include "../slashFunctions/slashFunctions.h"
@@ -47,6 +48,7 @@ private:
     int port;
     
     const std::string& filename = "chat.txt";
+    std::ofstream outputFile;
 
     // Pool de threads e mutex
     std::vector<std::thread> threadPool;

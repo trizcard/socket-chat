@@ -36,10 +36,9 @@ Server::Server(int port) : port(port), nextClientId(1) {
     }
 
     // Open file to write
-    std::ofstream outputFile(filename);
+    outputFile.open(filename);
     if (outputFile.is_open()) {
         outputFile << "Chat do servidor \n" << endl;
-        outputFile.close();
     } else {
         cerr << red << "Não foi possível criar o arquivo." << RESET << endl;
     }
@@ -142,10 +141,8 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     // a mensagem é [CLIENTE X]: *mensagem*
     string formattedMessage = string(blue) + "[" + hostUser.getName() + "]    " + gray + time + lightGray + buffer + "\n" + RESET;
 
-    ofstream inputFile(filename, ios::app);
-    if (inputFile.is_open()) {
-        inputFile << formattedMessage;
-        inputFile.close();
+    if (outputFile.is_open()) {
+        outputFile << formattedMessage;
     } else {
         std::cout << "Não foi possível abrir o arquivo.";
     }
