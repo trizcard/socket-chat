@@ -34,14 +34,6 @@ Server::Server(int port) : port(port), nextClientId(1) {
         cerr << red << "Erro ao escutar por conexões" << RESET << endl;
         // Pode lançar uma exceção aqui se preferir
     }
-
-    // Open file to write
-    outputFile.open(filename);
-    if (outputFile.is_open()) {
-        outputFile << "Chat do servidor \n" << endl;
-    } else {
-        cerr << red << "Não foi possível criar o arquivo." << RESET << endl;
-    }
 }
 
 Server::~Server() {
@@ -66,18 +58,18 @@ void Server::HandleClient(int clientSocket, int clientId) {
             clientDisconnect(newUser);
             break;
         }
-        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-        cout << gray << std::ctime(&now_c);
+        chrono::system_clock::time_point now = chrono::system_clock::now();
+        time_t now_c = chrono::system_clock::to_time_t(now);
+        cout << gray << ctime(&now_c);
 
         // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
-        cout << "[" << clientName << "] " << buffer << endl;
+        cout << "[" << newUser.getName() << "] " << buffer << endl;
 
         if (isAnyCommand(buffer))
         {
             ExecuteCommand(buffer, newUser);
         } else {
-            SendMessagesToAllClients(newUser, buffer, std::ctime(&now_c));
+            SendMessagesToAllClients(newUser, buffer, ctime(&now_c));
         }
 
         // const char* response = "Mensagem recebida pelo servidor";
@@ -100,7 +92,7 @@ void Server::clientDisconnect(User user) {
     }
 
     {
-        std::lock_guard<std::mutex> lock(threadPoolMutex);
+        lock_guard<mutex> lock(threadPoolMutex);
         for (auto it = users.begin(); it != users.end(); ++it)
         {
             if (it->getId() == user.getId())
@@ -141,12 +133,6 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     // a mensagem é [CLIENTE X]: *mensagem*
     string formattedMessage = string(blue) + "[" + hostUser.getName() + "]    " + gray + time + lightGray + buffer + "\n" + RESET;
 
-    if (outputFile.is_open()) {
-        outputFile << formattedMessage;
-    } else {
-        std::cout << "Não foi possível abrir o arquivo.";
-    }
-
     for (User user : users)
     {
         // Não enviar a mensagem para o próprio cliente
@@ -157,7 +143,7 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
 
         // Não enviar a mensagem de clientes mutados
         // TODO: arrumar /mute, o /muteall funciona
-        if (/*user.isMuted(hostUser.getId()) ||*/ generalMuteList.find(hostUser.getId()) != generalMuteList.end())
+        if (user.isMuted(hostUser.getId()) || generalMuteList.find(hostUser.getId()) != generalMuteList.end())
         {
             continue;
         }
@@ -166,7 +152,7 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     }
 }
 
-void Server::ExecuteCommand(string message, User clientUser)
+void Server::ExecuteCommand(string message, User& clientUser)
 {
     if (isCommand(message, "/mute"))
     {
@@ -174,7 +160,7 @@ void Server::ExecuteCommand(string message, User clientUser)
 
         bool found = false;
         string username = usernames.at(0);
-
+        
         for (User user : users)
         {
             if (user.getName() == username)
@@ -193,8 +179,8 @@ void Server::ExecuteCommand(string message, User clientUser)
     }
     else if (isCommand(message, "/unmute"))
     {
-        std::vector<std::string> usernames = extractUsernames(message);
-        for (std::string username : usernames)
+        vector<string> usernames = extractUsernames(message);
+        for (string username : usernames)
         {
             for (User user : users)
             {
@@ -208,8 +194,8 @@ void Server::ExecuteCommand(string message, User clientUser)
     }
     else if (isCommand(message, "/adminmute"))
     {
-        std::vector<std::string> usernames = extractUsernames(message);
-        for (std::string username : usernames)
+        vector<string> usernames = extractUsernames(message);
+        for (string username : usernames)
         {
             for (User user : users)
             {
@@ -223,8 +209,8 @@ void Server::ExecuteCommand(string message, User clientUser)
     }
     else if (isCommand(message, "/adminunmute"))
     {
-        std::vector<std::string> usernames = extractUsernames(message);
-        for (std::string username : usernames)
+        vector<string> usernames = extractUsernames(message);
+        for (string username : usernames)
         {
             for (User user : users)
             {
@@ -236,12 +222,21 @@ void Server::ExecuteCommand(string message, User clientUser)
             }
         }
     }
+
+    else if (isCommand(message, "/changename"))
+    {
+        vector<string> usernames = extractUsernames(message);
+        string newName = usernames.at(0);
+
+        clientUser.setName(newName);
+        cout << "User " << clientUser.getId() << " changed name to " << clientUser.getName() << endl;
+    }
 }
 
 void Server::ADMINmuteUser(User userToMute) {
     generalMuteList.insert(userToMute.getId());
 
-    std::string adminMessage = string(yellow) + "User " + userToMute.getName() + " has been muted by the admin.";
+    string adminMessage = string(yellow) + "User " + userToMute.getName() + " has been muted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);
@@ -252,7 +247,7 @@ void Server::ADMINunmuteUser(User userToUnmute)
 {
     generalMuteList.erase(userToUnmute.getId());
 
-    std::string adminMessage = string(yellow) + "User " + userToUnmute.getName() + " has been unmuted by the admin.";
+    string adminMessage = string(yellow) + "User " + userToUnmute.getName() + " has been unmuted by the admin.";
     for (User user : users)
     {
         send(user.getClientSocket(), adminMessage.c_str(), adminMessage.length(), 0);

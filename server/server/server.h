@@ -39,16 +39,13 @@ public:
     void SendMessagesToAllClients(User user, char *buffer, char *time);
     void clientDisconnect(User user);
 
-    void ExecuteCommand(std::string message, User user);
+    void ExecuteCommand(std::string message, User& user);
 
     void ADMINmuteUser(User user);
     void ADMINunmuteUser (User user);
 private:
     int serverSocket;
     int port;
-    
-    const std::string& filename = "chat.txt";
-    std::ofstream outputFile;
 
     // Pool de threads e mutex
     std::vector<std::thread> threadPool;
