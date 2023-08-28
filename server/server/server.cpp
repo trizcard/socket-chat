@@ -38,6 +38,7 @@ Server::Server(int port) : port(port), nextClientId(1) {
     // Open file to write
     std::ofstream outputFile(filename);
     if (outputFile.is_open()) {
+        outputFile << "Chat do servidor \n" << endl;
         outputFile.close();
     } else {
         cerr << red << "Não foi possível criar o arquivo." << RESET << endl;
@@ -72,15 +73,6 @@ void Server::HandleClient(int clientSocket, int clientId) {
 
         // TODO: mudar a mensagem, criar uma função bonitinha pra isso que envia o user e o buffer
         cout << "[" << clientName << "] " << buffer << endl;
-
-        std::ifstream inputFile(filename);
-        if (inputFile.is_open()) {
-            inputFile << string(std::ctime(&now_c));
-            inputFile << "[" << clientName << "] " << buffer;
-            inputFile.close();
-        } else {
-            std::cout << "Não foi possível abrir o arquivo." << std::endl;
-        }
 
         if (isAnyCommand(buffer))
         {
@@ -150,12 +142,12 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     // a mensagem é [CLIENTE X]: *mensagem*
     string formattedMessage = string(blue) + "[" + hostUser.getName() + "]    " + gray + time + lightGray + buffer + "\n" + RESET;
 
-    std::ifstream inputFile(filename);
+    ofstream inputFile(filename, ios::app);
     if (inputFile.is_open()) {
-        std::cout << formattedMessage << std::endl;
+        inputFile << formattedMessage;
         inputFile.close();
     } else {
-        std::cout << "Não foi possível abrir o arquivo." << std::endl;
+        std::cout << "Não foi possível abrir o arquivo.";
     }
 
     for (User user : users)
