@@ -141,15 +141,6 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     // a mensagem é [CLIENTE X]: *mensagem*
     string formattedMessage = formatMessage(buffer, time, hostUser);
 
-    if (outputFile.is_open())
-    {
-        outputFile << formattedMessage;
-    }
-    else
-    {
-        cout << "Não foi possível abrir o arquivo.";
-    }
-
     for (User user : users)
     {
         // Não enviar a mensagem de clientes mutados
