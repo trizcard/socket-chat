@@ -15,15 +15,6 @@
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 5
 
-#define red "\033[1;31m"
-#define green "\033[1;92m"
-#define gray "\033[1;90m"
-#define lightGray "\033[0;37m"
-#define blue "\033[1;94m"
-#define yellow "\033[1;93m"
-
-#define RESET "\033[1;97m"
-
 typedef struct muteData {
     int mutedById;
     int mutedId;
@@ -36,17 +27,23 @@ public:
 
     void StartListening();
 
+    void SendSingleMessage(const string &message, User user);
     void SendMessagesToAllClients(User user, char *buffer, char *time);
     void clientDisconnect(User user);
 
-    void ExecuteCommand(std::string message, User user);
+    void ExecuteCommand(string message, User& user);
+    
+    bool isValidUser(User user, string username);
+    bool isUsernameTaken(string username);
+    bool mustHaveUserInput(vector<User> users, size_t numberOfUsers, User sender);
 
+    bool ADMINisMuted(User user);
     void ADMINmuteUser(User user);
     void ADMINunmuteUser (User user);
 private:
     int serverSocket;
     int port;
-    
+
     const std::string& filename = "chat.txt";
     std::ofstream outputFile;
 

@@ -22,8 +22,9 @@ $(BUILD_DIR):
 $(BUILD_DIR)/$(TARGET): $(OBJS) main.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) main.cpp
 
-$(BUILD_DIR)/%.o: */%.cpp */%.h
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+# Compile individual source files
+$(BUILD_DIR)/%.o: $(foreach dir,$(SRC_DIR),$(wildcard $(dir)/*.cpp)) $(foreach dir,$(SRC_DIR),$(wildcard $(dir)/*.h))
+	$(CXX) $(CXXFLAGS) -c -o $@ $(filter %/$(notdir $(@:.o=.cpp)),$(SRCS))
 
 run:
 	./$(BUILD_DIR)/$(TARGET)
