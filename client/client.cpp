@@ -93,7 +93,10 @@ void SendThread(Client *client)
 
 int main()
 {
-    const char *SERVER_IP = "192.168.0.252";
+    char IP[16];
+    cout << "Digite o IP do servidor: ";
+    cin >> IP;
+    const char *SERVER_IP = IP;
     const int PORT = 8080;
 
     Client client(SERVER_IP, PORT);
