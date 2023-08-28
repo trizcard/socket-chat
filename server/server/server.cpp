@@ -228,9 +228,22 @@ void Server::ExecuteCommand(string message, User& clientUser)
         vector<string> usernames = extractUsernames(message);
         string newName = usernames.at(0);
 
+        {
+            lock_guard<mutex> lock(threadPoolMutex);
+            for (User& user : users)
+            {
+                if (user.getId() == clientUser.getId())
+                {
+                    user.setName(newName);
+                    break;
+                }
+            }
+        }
+
         clientUser.setName(newName);
-        cout << "User " << clientUser.getId() << " changed name to " << clientUser.getName() << endl;
+        cout << "CLIENTE_" << clientUser.getId() << " changed name to " << clientUser.getName() << endl;
     }
+
 }
 
 void Server::ADMINmuteUser(User userToMute) {
