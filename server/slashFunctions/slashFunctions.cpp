@@ -61,11 +61,11 @@ vector<User>::iterator getUserFromUsername(const string &username, vector<User> 
     {
         if (it->getName() == username)
         {
-            return it; // Return iterator to the found User object
+            return it; // Retorna o iterador encontrado
         }
     }
 
-    return users.end(); // Return iterator to the end if user not found
+    return users.end(); // Retorna iterador para o final se o usuário não for encontrado
 }
 
 string colorString(const string &message, const string &color)

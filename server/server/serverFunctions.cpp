@@ -54,8 +54,6 @@ void Server::ExecuteCommand(string message, User& clientUser)
         return;
     }
 
-    vector<User> users;
-
     // checa cada username pra ver se ele existe mesmo
     if (!usernames.empty())
     {
@@ -73,17 +71,39 @@ void Server::ExecuteCommand(string message, User& clientUser)
 
     if (isCommand(message, "/mute") && mustHaveUserInput(users, 1, clientUser))
     {
-        User searchedUser = users.at(0);
+        bool found = false;
+        string username = usernames.at(0);
 
-        if (clientUser.isMuted(searchedUser))
         {
-            this->SendSingleMessage(colorString("Usuário " + usernames.at(0) + " já está mutado para você", red), clientUser);
-            return;
+            lock_guard<mutex> lock(threadPoolMutex);
+
+            for (User& user : users)
+            {
+                if (user.getName() == username)
+                {
+                    User blockedUser = user;
+
+                    for (User& user : users)
+                    {
+                        if (user.getId() == clientUser.getId())
+                        {
+                            user.muteUser(blockedUser);
+                            found = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         }
 
-        clientUser.muteUser(searchedUser);
-        return;
+        if (!found)
+        {
+            // TODO: send error message
+            cout << red << "User " << username << " not found" << endl;
+        }
     }
+
     else if (isCommand(message, "/unmute") && mustHaveUserInput(users, 1, clientUser))
     {
         User searchedUser = users.at(0);
@@ -162,7 +182,7 @@ bool Server::ADMINisMuted(User user)
 
 bool Server::isValidUser(User user, string username)
 {
-    if (user.getId() == -1)
+    if (user.getId() == NULL || user.getId() == -1)
     {
         printServerError("Usuário " + username + " não encontrado");
         this->SendSingleMessage(colorString("Usuário " + username + " não encontrado", red), user);

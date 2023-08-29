@@ -145,12 +145,10 @@ void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
     {
         // Não enviar a mensagem de clientes mutados
         // TODO: arrumar /mute, o /muteall funciona
-        if (/*user.isMuted(hostUser.getId()) ||*/ ADMINisMuted(user))
+        if (!(user.isMuted(hostUser.getId()) || ADMINisMuted(user)))
         {
-            continue;
+            this->SendSingleMessage(formattedMessage, user);
         }
-
-        this->SendSingleMessage(formattedMessage, user);
     }
 }
 
