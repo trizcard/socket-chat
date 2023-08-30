@@ -27,6 +27,7 @@ private:
     std::string name;
     int clientSocket;
     std::set<int> muteList;
+    bool isAdmin;
 };
 
 #endif // USER_H

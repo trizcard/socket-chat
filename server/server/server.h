@@ -15,15 +15,6 @@
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 5
 
-#define red "\033[1;31m"
-#define green "\033[1;92m"
-#define gray "\033[1;90m"
-#define lightGray "\033[0;37m"
-#define blue "\033[1;94m"
-#define yellow "\033[1;93m"
-
-#define RESET "\033[1;97m"
-
 typedef struct muteData {
     int mutedById;
     int mutedId;
@@ -36,13 +27,31 @@ public:
 
     void StartListening();
 
-    void SendMessagesToAllClients(User user, char *buffer, char *time);
+    void SendSingleMessage(const string &message, User user);
+    void SendMessageToAll(const string &message, vector<User> exceptionUsers);
+    void SendTextMessageToAll(User *user, char *buffer, char *time);
+    void SendMessageAndPrint(const string &message, User user);
     void clientDisconnect(User user);
 
-    void ExecuteCommand(std::string message, User& user);
+    void ExecuteCommand(string message, User* user);
 
-    void ADMINmuteUser(User user);
-    void ADMINunmuteUser (User user);
+    bool isValidUser(User *searchedUser, string searchedUsername, User *clientUser);
+    bool isUsernameTaken(string username);
+    bool mustHaveUserInput(vector<string> users, size_t numberOfUsers, User *sender);
+
+    bool ADMINisMuted(User user);
+
+    void ADMINmuteUserCommand(string username, User *clientUser);
+    void ADMINunmuteUserCommand(string username, User *clientUser);
+
+    void muteUserCommand(string username, User *clientUser);
+    void unmuteUserCommand(string username, User *clientUser);
+    void changeNameCommand(string newName, User *clientUser);
+    void helpCommand(User *clientUser);
+
+    User *getUserById(int id);
+    User *getUserByName(string name);
+
 private:
     int serverSocket;
     int port;
