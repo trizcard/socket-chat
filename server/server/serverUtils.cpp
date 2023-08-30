@@ -23,6 +23,17 @@ bool Server::isValidUser(User* searchedUser, string searchedUsername, User* clie
 }
 
 
+bool Server::isAdmin(User* user)
+{
+    if(!user->getAdmin()) {
+        this->SendSingleMessage(colorString("Você não tem permissão para executar este comando", red), *user);
+        return false;
+    }
+
+    return true;
+}
+
+
 /**
  * Verifica se houve uma entrada
  * 

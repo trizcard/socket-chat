@@ -93,6 +93,22 @@ void User::setName(std::string name)
 }
 
 /**
+ * Altera se o usuário é administrador
+*/
+void User::setAdmin(bool isAdmin)
+{
+    this->isAdmin = isAdmin;
+}
+
+/**
+ * Verifica se o usuário é administrador
+*/
+bool User::getAdmin()
+{
+    return this->isAdmin;
+}
+
+/**
  * Retorna o socket do usuário
  *
  * @return socket do usuário
