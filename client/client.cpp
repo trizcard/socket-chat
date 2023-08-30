@@ -44,6 +44,7 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
 
     isConnected.store(true);
     cout << green << "Conectado ao servidor" << RESET << endl;
+    cout << endl;
 }
 
 /**

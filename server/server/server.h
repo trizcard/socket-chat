@@ -48,9 +48,11 @@ public:
     void unmuteUserCommand(string username, User *clientUser);
     void changeNameCommand(string newName, User *clientUser);
     void helpCommand(User *clientUser);
+    void setAdminCommand(string username, User *clientUser);
 
     User *getUserById(int id);
     User *getUserByName(string name);
+    bool isAdmin(User* user);
 
 private:
     int serverSocket;

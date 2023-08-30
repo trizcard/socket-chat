@@ -4,6 +4,9 @@
 #include <string>
 #include <set>
 
+// deve ser mudado para um arquivo .h separado que irá ficar oculto. Senha para demonstração
+#define ADMIN_PASSWORD "admin"
+
 class User {
 public:
     User(int id, int socket, std::string name);
@@ -17,6 +20,8 @@ public:
 
     void setId(int id);
     void setName(std::string name);
+    void setAdmin(bool isAdmin);
+    bool getAdmin();
     void setClientSocket(int clientSocket);
 
     void muteUser(User user);
