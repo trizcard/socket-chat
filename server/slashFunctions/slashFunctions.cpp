@@ -10,6 +10,9 @@ using namespace std;
 
 /**
  * Verifica se a mensagem possui algum comando
+ * 
+ * @param message Mensagem a ser verificada
+ * @return true Se a mensagem possui algum comando
 */
 bool isAnyCommand(const string &message)
 {
@@ -18,6 +21,10 @@ bool isAnyCommand(const string &message)
 
 /**
  * Verifica se a mensagem é um comando
+ * 
+ * @param message Mensagem a ser verificada
+ * @param command Comando a ser verificado
+ * @return true Se a mensagem é um comando
 */
 bool isCommand(const string &message, const string &command)
 {
@@ -44,6 +51,9 @@ bool isCommand(const string &message, const string &command)
 
 /**
  * Extrai o nome do usuário da mensagem
+ * 
+ * @param message Mensagem a ser verificada
+ * @return Nomes do usuário
 */
 vector<string> extractUsernames(const string &message)
 {
@@ -63,6 +73,10 @@ vector<string> extractUsernames(const string &message)
 
 /**
  * Retorna o iterador do usuário a partir do nome de usuário
+ * 
+ * @param username Nome do usuário
+ * @param users Vetor de usuários
+ * @return Iterador do usuário
 */
 vector<User>::iterator getUserFromUsername(const string &username, vector<User> &users)
 {
@@ -79,6 +93,10 @@ vector<User>::iterator getUserFromUsername(const string &username, vector<User> 
 
 /**
  * Inclui cor a uma string
+ * 
+ * @param message Mensagem a ser colorida
+ * @param color Cor a ser adicionada
+ * @return Mensagem colorida
 */
 string colorString(const string &message, const string &color)
 {
@@ -87,6 +105,12 @@ string colorString(const string &message, const string &color)
 
 /**
  * Formata a mensagem para ser enviada
+ * 
+ * @param message Mensagem a ser formatada
+ * @param time Hora da mensagem
+ * @param hostUser Usuário que enviou a mensagem
+ * @param color Cor da mensagem
+ * @return Mensagem formatada
 */
 string formatMessage (const string &message, const string &time, User hostUser, const string &color)
 {
@@ -99,6 +123,9 @@ string formatMessage (const string &message, const string &time, User hostUser, 
 
 /**
  * Imprime uma mensagem do servidor
+ * 
+ * @param message Mensagem a ser impressa
+ * @param color Cor da mensagem
 */
 void printServerMessage (const string &message, const string &color)
 {
@@ -107,6 +134,8 @@ void printServerMessage (const string &message, const string &color)
 
 /**
  * Imprime uma mensagem de erro do servidor
+ * 
+ * @param message Mensagem de erro
 */
 void printServerError (const string &message)
 {
