@@ -239,6 +239,8 @@ void Server::changeNameCommand(string newName, User *clientUser)
 
 /**
  * Comando de ajuda, mostra os comandos disponíveis
+ * 
+ * @param clientUser Usuário que enviou o comando
  */
 void Server::helpCommand(User *clientUser)
 {

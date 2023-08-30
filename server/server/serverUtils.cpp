@@ -22,7 +22,12 @@ bool Server::isValidUser(User* searchedUser, string searchedUsername, User* clie
     return true;
 }
 
-
+/**
+ * Verifica se é admin
+ * 
+ * @param user Usuário
+ * @return true Se é admin
+*/
 bool Server::isAdmin(User* user)
 {
     if(!user->getAdmin()) {
