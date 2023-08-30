@@ -240,28 +240,6 @@ void Server::SendMessageToAll(const string &message, vector<User> exceptionUsers
             this->SendSingleMessage(message, user);
         }
     }
-
-    else if (isCommand(message, "/changename"))
-    {
-        vector<string> usernames = extractUsernames(message);
-        string newName = usernames.at(0);
-
-        {
-            lock_guard<mutex> lock(threadPoolMutex);
-            for (User& user : users)
-            {
-                if (user.getId() == clientUser.getId())
-                {
-                    user.setName(newName);
-                    break;
-                }
-            }
-        }
-
-        clientUser.setName(newName);
-        cout << "CLIENTE_" << clientUser.getId() << " changed name to " << clientUser.getName() << endl;
-    }
-
 }
 
 /**
