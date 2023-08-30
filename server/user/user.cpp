@@ -3,7 +3,7 @@
 
 /**
  * Construtor da classe User
- * 
+ *
  * @param id id do usuário
  * @param socket socket do usuário
  * @param name nome do usuário
@@ -14,11 +14,12 @@ User::User(int id, int socket, std::string name)
     this->name = name;
     this->clientSocket = socket;
     this->muteList = std::set<int>();
+    this->isAdmin = false;
 }
 
 /**
  * Construtor da classe User
- * 
+ *
  * @param id id do usuário
  * @param name nome do usuário
 */
@@ -27,11 +28,12 @@ User::User(int id, std::string name)
     this->id = id;
     this->name = name;
     this->muteList = std::set<int>();
+    this->isAdmin = false;
 }
 
 /**
  * Construtor da classe User
- * 
+ *
  * @param id id do usuário
 */
 User::User(int id)
@@ -39,6 +41,7 @@ User::User(int id)
     this->id = id;
     this->name = "";
     this->muteList = std::set<int>();
+    this->isAdmin = false;
 }
 
 /**
@@ -51,7 +54,7 @@ User::~User()
 
 /**
  * Retorna o id do usuário
- * 
+ *
  * @return id do usuário
 */
 int User::getId()
@@ -61,7 +64,7 @@ int User::getId()
 
 /**
  * Retorna o nome do usuário
- * 
+ *
  * @return nome do usuário
 */
 std::string User::getName()
@@ -71,7 +74,7 @@ std::string User::getName()
 
 /**
  * Altera o id do usuário
- * 
+ *
  * @param id novo id do usuário
 */
 void User::setId(int id)
@@ -81,7 +84,7 @@ void User::setId(int id)
 
 /**
  * Altera o nome do usuário
- * 
+ *
  * @param name novo nome do usuário
 */
 void User::setName(std::string name)
@@ -91,7 +94,7 @@ void User::setName(std::string name)
 
 /**
  * Retorna o socket do usuário
- * 
+ *
  * @return socket do usuário
 */
 int User::getClientSocket()
@@ -101,7 +104,7 @@ int User::getClientSocket()
 
 /**
  * Altera o socket do usuário
- * 
+ *
  * @param clientSocket novo socket do usuário
 */
 void User::setClientSocket(int clientSocket)
@@ -113,7 +116,7 @@ void User::setClientSocket(int clientSocket)
 
 /**
  * Adiciona um usuário à lista de usuários mutados
- * 
+ *
  * @param user usuário a ser mutado
 */
 void User::muteUser(User user)
@@ -123,7 +126,7 @@ void User::muteUser(User user)
 
 /**
  * Remove um usuário da lista de usuários mutados
- * 
+ *
  * @param user usuário a ser desmutado
 */
 void User::unmuteUser(User user)
@@ -133,7 +136,7 @@ void User::unmuteUser(User user)
 
 /**
  * Verifica se um usuário está mutado
- * 
+ *
  * @param user usuário a ser verificado
  * @return true se o usuário estiver mutado, false caso contrário
 */

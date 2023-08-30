@@ -19,7 +19,7 @@ Server::Server(int port) : port(port), nextClientId(1)
     if (serverSocket == -1)
     {
         printServerError("Erro ao criar o socket");
-        return;
+        exit(-1);
     }
 
     serverAddr.sin_family = AF_INET;
@@ -29,14 +29,17 @@ Server::Server(int port) : port(port), nextClientId(1)
     if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
     {
         printServerError("Erro ao associar o socket ao endereço");
-        return;
+        exit(-1);
     }
 
     if (listen(serverSocket, MAX_CLIENTS) == -1)
     {
         printServerError("Erro ao escutar por conexões");
-        return;
+        exit(-1);
     }
+
+    // reserva espaço para o número máximo de clientes
+    users.reserve(MAX_CLIENTS);
 }
 
 Server::~Server()
@@ -56,27 +59,29 @@ void Server::HandleClient(int clientSocket, int clientId)
         users.push_back(newUser);
     }
 
+    User *user = getUserById(clientId);
+
     while (true)
     {
         memset(buffer, 0, sizeof(buffer));
         int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesReceived <= 0)
         {
-            clientDisconnect(newUser);
+            clientDisconnect(*user);
             break;
         }
         chrono::system_clock::time_point now = chrono::system_clock::now();
         time_t now_c = chrono::system_clock::to_time_t(now);
 
-        cout << formatMessage(buffer, ctime(&now_c), newUser) << endl;
+        cout << formatMessage(buffer, ctime(&now_c), *user, blue) << endl;
 
         if (isAnyCommand(buffer))
         {
-            ExecuteCommand(buffer, newUser);
+            ExecuteCommand(buffer, user);
         }
         else
         {
-            SendMessagesToAllClients(newUser, buffer, ctime(&now_c));
+            SendTextMessageToAll(user, buffer, ctime(&now_c));
         }
     }
 
@@ -136,16 +141,28 @@ void Server::StartListening()
     }
 }
 
-void Server::SendMessagesToAllClients(User hostUser, char *buffer, char *time)
+void Server::SendTextMessageToAll(User* hostUser, char *buffer, char *time)
 {
+    if (ADMINisMuted(*hostUser))
+    {
+        SendMessageAndPrint("Você está mutado e não pode enviar mensagens", *hostUser);
+        return;
+    }
+
     // a mensagem é [CLIENTE X]: *mensagem*
-    string formattedMessage = formatMessage(buffer, time, hostUser);
+    string formattedMessage = formatMessage(buffer, time, *hostUser, blue);
+    string formattedSenderMessage = formatMessage(buffer, time, *hostUser, green);
 
     for (User user : users)
     {
-        // Não enviar a mensagem de clientes mutados
-        // TODO: arrumar /mute, o /muteall funciona
-        if (!(user.isMuted(hostUser.getId()) || ADMINisMuted(user)))
+        // Se é o próprio usuário, enviar com cor diferente
+        if (user.getId() == hostUser->getId()) {
+            this->SendSingleMessage(formattedSenderMessage, user);
+            continue;
+        }
+
+        // Não enviar a mensagem de clientes mutados para o usuário
+        if (!user.isMuted(hostUser->getId()))
         {
             this->SendSingleMessage(formattedMessage, user);
         }
@@ -156,4 +173,30 @@ void Server::SendSingleMessage(const string &message, User user)
 {
     string formattedMessage = message + "\n";
     send(user.getClientSocket(), formattedMessage.c_str(), formattedMessage.length(), 0);
+}
+
+void Server::SendMessageToAll(const string &message, vector<User> exceptionUsers)
+{
+    for (User user : users)
+    {
+        bool isException = false;
+        for (User exceptionUser : exceptionUsers)
+        {
+            if (user.getId() == exceptionUser.getId())
+            {
+                isException = true;
+                break;
+            }
+        }
+        if (!isException)
+        {
+            this->SendSingleMessage(message, user);
+        }
+    }
+}
+
+void Server::SendMessageAndPrint(const string &message, User user)
+{
+    SendSingleMessage(message, user);
+    printServerMessage(message, yellow);
 }

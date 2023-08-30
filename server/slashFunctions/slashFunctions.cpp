@@ -88,11 +88,11 @@ string colorString(const string &message, const string &color)
 /**
  * Formata a mensagem para ser enviada
 */
-string formatMessage (const string &message, const string &time, User hostUser)
+string formatMessage (const string &message, const string &time, User hostUser, const string &color)
 {
     string formattedName = "[" + hostUser.getName() + "]    ";
     return (
-        colorString(formattedName, blue) +
+        colorString(formattedName, color) +
         colorString(time, gray) +
         colorString(message, lightGray));
 }

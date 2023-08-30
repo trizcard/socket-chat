@@ -28,18 +28,30 @@ public:
     void StartListening();
 
     void SendSingleMessage(const string &message, User user);
-    void SendMessagesToAllClients(User user, char *buffer, char *time);
+    void SendMessageToAll(const string &message, vector<User> exceptionUsers);
+    void SendTextMessageToAll(User *user, char *buffer, char *time);
+    void SendMessageAndPrint(const string &message, User user);
     void clientDisconnect(User user);
 
-    void ExecuteCommand(string message, User& user);
-    
-    bool isValidUser(User user, string username);
+    void ExecuteCommand(string message, User* user);
+
+    bool isValidUser(User *searchedUser, string searchedUsername, User *clientUser);
     bool isUsernameTaken(string username);
-    bool mustHaveUserInput(vector<User> users, size_t numberOfUsers, User sender);
+    bool mustHaveUserInput(vector<string> users, size_t numberOfUsers, User *sender);
 
     bool ADMINisMuted(User user);
-    void ADMINmuteUser(User user);
-    void ADMINunmuteUser (User user);
+
+    void ADMINmuteUserCommand(string username, User *clientUser);
+    void ADMINunmuteUserCommand(string username, User *clientUser);
+
+    void muteUserCommand(string username, User *clientUser);
+    void unmuteUserCommand(string username, User *clientUser);
+    void changeNameCommand(string newName, User *clientUser);
+    void helpCommand(User *clientUser);
+
+    User *getUserById(int id);
+    User *getUserByName(string name);
+
 private:
     int serverSocket;
     int port;

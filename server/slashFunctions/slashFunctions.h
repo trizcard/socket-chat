@@ -24,7 +24,7 @@ bool isCommand(const string &message, const string &command);
 vector<string> extractUsernames(const string &message);
 vector<User>::iterator getUserFromUsername(const string &username, vector<User> &users);
 
-string formatMessage(const string &message, const string &time, User hostUser);
+string formatMessage(const string &message, const string &time, User hostUser, const string &color);
 string colorString(const string &message, const string &color);
 void printServerMessage(const string &message, const string &color);
 void printServerError(const string &message);

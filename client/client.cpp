@@ -13,7 +13,7 @@ const int BUFFER_SIZE = 1024;
 
 /**
  * Construtor da classe Client
- * 
+ *
  * @param serverIP IP do servidor
  * @param port porta do servidor
 */
@@ -24,7 +24,7 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
     isConnected.store(false);     // inicializa a variável de controle de conexão
 
     // cria o socket e verifica se ocorreu algum erro
-    clientSocket = socket(AF_INET, SOCK_STREAM, 0); 
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket == -1)
     {
         cerr << red << "Erro ao criar o socket" << RESET << endl;
@@ -51,13 +51,13 @@ Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
 */
 Client::~Client()
 {
-    close(clientSocket); 
+    close(clientSocket);
 }
 
 
 /**
  * Retorna o socket do cliente
- * 
+ *
  * @return socket do cliente
 */
 int Client::getClientSocket()
@@ -68,7 +68,7 @@ int Client::getClientSocket()
 
 /**
  * Altera o valor da variável de controle de conexão
- * 
+ *
  * @param connected novo valor da variável de controle de conexão
 */
 void Client::setConnected(bool connected)
@@ -79,7 +79,7 @@ void Client::setConnected(bool connected)
 
 /**
  * Retorna o valor da variável de controle de conexão
- * 
+ *
  * @return valor da variável de controle de conexão
 */
 bool Client::getConnected()
@@ -89,7 +89,7 @@ bool Client::getConnected()
 
 /**
  * Thread que fica escutando o servidor
- * 
+ *
  * @param client ponteiro para o objeto Client
 */
 void ListenThread(Client *client)
@@ -115,7 +115,7 @@ void ListenThread(Client *client)
 
 /**
  * Thread que fica enviando mensagens para o servidor
- * 
+ *
  * @param client ponteiro para o objeto Client
 */
 void SendThread(Client *client)
@@ -128,7 +128,7 @@ void SendThread(Client *client)
         // apaga a linha recem digitada
         cout << "\x1b[1F"
              << "\x1b[2K";
-        
+
         send(client->getClientSocket(), message.c_str(), message.length(), 0); // envia a mensagem
     }
 }
