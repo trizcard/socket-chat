@@ -55,6 +55,7 @@ Server::Server(int port) : port(port), nextClientId(1)
 Server::~Server()
 {
     close(serverSocket);
+
 }
 
 /**
@@ -165,7 +166,24 @@ void Server::StartListening()
         cv.wait(lock, [this]
                 { return threadPool.size() < MAX_CLIENTS; });
 
-        threadPool.emplace_back(&Server::HandleClient, this, newSocket, clientId);
+        threadPool.emplace_back(&Server::HandleClient, this, newSocket, clientId);close(serverSocket);
+
+        string comando;
+        cin >> comando;
+        if (comando == "/close")
+        {
+            for (User user : users)
+            {
+                string formattedMessage = colorString("O servidor foi fechado", red);
+                this->SendSingleMessage(formattedMessage, user);
+
+                clientDisconnect(user);
+            }
+
+            printServerError("Servidor fechado");
+            close(serverSocket);
+            exit(0);
+        }
     }
 }
 
