@@ -28,17 +28,32 @@ O projeto está organizado em pastas de acordo com suas funcionalidades:
 O servidor é responsável por gerenciar o chat em grupo, utilizando sockets TCP para comunicação, e os comandos dos clientes. Os comandos disponíveis são:
 
 Comando no cliente:
-- ... (restante do conteúdo igual)
-
-Comando no servidor:
-- ... (restante do conteúdo igual)
+- `/mute usuário`: Muta o usuário especificado (apenas para o cliente que emitiu o comando).
+- `/unmute usuário`: Desmuta o usuário especificado.
+- `/changename newUser`: Altera o nome do usuário que emitiu o comando.
+- `/adminmute usuário`: Muta o usuário especificado para todos.
+- `/adminunmute usuário`: Desmuta o usuário especificado para todos.
+- `/help`: Mostra a lista de comandos disponíveis e suas funcionalidades.
+- `/setadmin senha`: Concede privilégios de administrador ao usuário que emitiu o comando (senha necessária).
+- `/userlist`: Mostra a lista de todos os usuários conectados ao servidor.
 
 ## Compilação e Execução
 
-... (restante do conteúdo igual)
+Para compilar e executar o servidor, siga os seguintes passos:
+
+1. Navegue para a pasta `server/`.
+2. Execute o comando `make` para compilar o servidor.
+3. Execute o comando `make run` para iniciar o servidor.
+
+Para compilar e executar o cliente, siga os seguintes passos:
+
+1. Navegue para a pasta `client/`.
+2. Execute o comando `make` para compilar o cliente.
+3. Execute o comando `make run` para iniciar o cliente.
+4. Insira o IP do servidor
 
 ## Observações
 
-- ... (restante do conteúdo igual)
+- A senha necessária para o comando `/setadmin` é armazenada no próprio código por fins práticos. Em uma implementação real, a senha deve ser armazenada de forma segura e protegida, talvez em um arquivo de configuração oculto.
 
 Este projeto é uma implementação básica de um chat em grupo utilizando comunicação via sockets TCP e threads individuais para cada cliente. Sinta-se à vontade para expandir e melhorar suas funcionalidades de acordo com as suas necessidades.
