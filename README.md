@@ -39,7 +39,6 @@ Comando no cliente:
 - `/adminunmute usuário`: Desmuta o usuário especificado para todos.
 - `/help`: Mostra a lista de comandos disponíveis e suas funcionalidades.
 - `/setadmin senha`: Concede privilégios de administrador ao usuário que emitiu o comando (senha necessária).
-- `/userlist`: Mostra a lista de todos os usuários conectados ao servidor.
 
 ## Compilação e Execução
 

@@ -13,7 +13,7 @@ using namespace std;
 
 /**
  * Cria um servidor
- * 
+ *
  * @param port Porta do servidor
  * @param nextClientId Próximo ID de cliente
  * @return Servidor criado
@@ -35,8 +35,13 @@ Server::Server(int port) : port(port), nextClientId(1)
 
     if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1) // erro ao associar o socket ao endereço
     {
-        printServerError("Erro ao associar o socket ao endereço");
-        exit(-1);
+        int yes = 1;
+
+        if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1)
+        {
+            printServerError("Erro ao associar o socket ao endereço");
+            exit(-1);
+        }
     }
 
     if (listen(serverSocket, MAX_CLIENTS) == -1) // erro ao escutar por conexões
@@ -54,13 +59,22 @@ Server::Server(int port) : port(port), nextClientId(1)
 */
 Server::~Server()
 {
-    close(serverSocket);
+    for (User user : users)
+    {
+        string formattedMessage = colorString("O servidor foi fechado", red);
+        this->SendSingleMessage(formattedMessage, user);
 
+        clientDisconnect(user);
+    }
+
+    printServerError("Servidor fechado");
+    close(serverSocket);
+    exit(0);
 }
 
 /**
  * Lida com um cliente
- * 
+ *
  * @param clientSocket Socket do cliente
  * @param clientId ID do cliente
 */
@@ -87,7 +101,7 @@ void Server::HandleClient(int clientSocket, int clientId)
             clientDisconnect(*user);
             break;
         }
-        
+
         // Pega o tempo atual
         chrono::system_clock::time_point now = chrono::system_clock::now();
         time_t now_c = chrono::system_clock::to_time_t(now);
@@ -114,7 +128,7 @@ void Server::HandleClient(int clientSocket, int clientId)
 
 /**
  * Desconexa de um cliente
- * 
+ *
  * @param user Usuário que desconectou
 */
 void Server::clientDisconnect(User user)
@@ -133,8 +147,21 @@ void Server::clientDisconnect(User user)
             if (it->getId() == user.getId())
             {
                 users.erase(it); // remove o usuário da lista de usuários
-                break; 
+                break;
             }
+        }
+    }
+}
+
+void Server::HearCommands()
+{
+    string command;
+    while (true)
+    {
+        cin >> command;
+        if (command == "/close")
+        {
+            this->~Server();
         }
     }
 }
@@ -148,6 +175,8 @@ void Server::StartListening()
     socklen_t addrLen = sizeof(clientAddr);
 
     printServerMessage("Servidor escutando na porta " + to_string(port), green); // imprime a mensagem no servidor
+
+    thread hearCommands = thread(&Server::HearCommands, this); // inicia a thread que escuta por comandos
 
     while (true)
     {
@@ -166,30 +195,13 @@ void Server::StartListening()
         cv.wait(lock, [this]
                 { return threadPool.size() < MAX_CLIENTS; });
 
-        threadPool.emplace_back(&Server::HandleClient, this, newSocket, clientId);close(serverSocket);
-
-        string comando;
-        cin >> comando;
-        if (comando == "/close")
-        {
-            for (User user : users)
-            {
-                string formattedMessage = colorString("O servidor foi fechado", red);
-                this->SendSingleMessage(formattedMessage, user);
-
-                clientDisconnect(user);
-            }
-
-            printServerError("Servidor fechado");
-            close(serverSocket);
-            exit(0);
-        }
+        threadPool.emplace_back(&Server::HandleClient, this, newSocket, clientId);
     }
 }
 
 /**
  * Envia uma mensagem para todos os clientes
- * 
+ *
  * @param hostUser Usuário que enviou a mensagem
  * @param buffer Mensagem a ser enviada
  * @param time Tempo que a mensagem foi enviada
@@ -224,7 +236,7 @@ void Server::SendTextMessageToAll(User* hostUser, char *buffer, char *time)
 
 /**
  * Envia uma mensagem para um único cliente
- * 
+ *
  * @param message Mensagem a ser enviada
  * @param user Usuário que receberá a mensagem
 */
@@ -236,7 +248,7 @@ void Server::SendSingleMessage(const string &message, User user)
 
 /**
  * Envia uma mensagem para todos os clientes, exceto os usuários passados
- * 
+ *
  * @param message Mensagem a ser enviada
  * @param exceptionUsers Usuários que não receberão a mensagem
 */
@@ -262,7 +274,7 @@ void Server::SendMessageToAll(const string &message, vector<User> exceptionUsers
 
 /**
  * Envia uma mensagem e a imprime no servidor
- * 
+ *
  * @param message Mensagem a ser enviada
  * @param user Usuário que receberá a mensagem
 */

@@ -20,6 +20,9 @@ public:
     int getClientSocket();
     void setConnected(bool connected);
     bool getConnected();
+
+    void makeConnection();
+    void tryToReconnect();
 private:
     int clientSocket;
     const char* serverIP;

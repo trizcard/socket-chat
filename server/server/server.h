@@ -31,6 +31,7 @@ public:
     void SendMessageToAll(const string &message, vector<User> exceptionUsers);
     void SendTextMessageToAll(User *user, char *buffer, char *time);
     void SendMessageAndPrint(const string &message, User user);
+    void HearCommands();
     void clientDisconnect(User user);
 
     void ExecuteCommand(string message, User* user);

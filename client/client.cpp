@@ -19,30 +19,39 @@ const int BUFFER_SIZE = 1024;
 */
 Client::Client(const char *serverIP, int port) : serverIP(serverIP), port(port)
 {
-
-    struct sockaddr_in serverAddr; // estrutura que armazena informações do servidor
     isConnected.store(false);     // inicializa a variável de controle de conexão
 
-    // cria o socket e verifica se ocorreu algum erro
-    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket == -1)
-    {
-        cerr << red << "Erro ao criar o socket" << RESET << endl;
-    }
+    makeConnection();
+}
+
+void Client::makeConnection()
+{
+    struct sockaddr_in serverAddr; // estrutura que armazena informações do servidor
 
     // configura a estrutura do servidor
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
     inet_pton(AF_INET, serverIP, &serverAddr.sin_addr);
 
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (clientSocket == -1)
+    {
+        cerr << red << "Erro ao criar o socket" << RESET << endl;
+        isConnected.store(false);
+        return;
+    }
+
     // conecta ao servidor e verifica se ocorreu algum erro
     if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
     {
         cerr << red << "Erro ao conectar ao servidor" << RESET << endl;
+        isConnected.store(false);
         return;
     }
 
     isConnected.store(true);
+
     cout << green << "Conectado ao servidor" << RESET << endl;
     cout << endl;
 }
@@ -107,10 +116,29 @@ void ListenThread(Client *client)
         {
             client->setConnected(false);
             cerr << red << "Conexão encerrada pelo servidor" << RESET << endl;
-            break;
+
+            client->tryToReconnect();
         }
 
         cout << "\n" << buffer << endl;
+    }
+}
+
+void Client::tryToReconnect()
+{
+    while (!getConnected())
+    {
+        cout << "Tentando reconectar..." << endl;
+        sleep(5);
+        makeConnection();
+
+        if (this->getConnected())
+        {
+            cout << green << "Conectado ao servidor" << RESET << endl;
+            cout << endl;
+
+            break;
+        }
     }
 }
 
