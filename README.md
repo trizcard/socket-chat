@@ -1,5 +1,9 @@
 # Group Chat - Servidor e Cliente (TCP Socket e Threads)
 
+Autores:
+Beatriz Cardoso de Oliveira - NUSP: 12566400
+Heitor Tanoue de Mello - NUSP: 12547260
+
 Este é um projeto de servidor e cliente em C++ para um chat em grupo. O servidor utiliza sockets TCP para comunicação assíncrona e emprega uma thread dedicada para cada cliente conectado, permitindo a comunicação simultânea com vários clientes. O uso de threads garante que o servidor possa lidar com múltiplas conexões de forma eficiente, sem bloquear outras operações.
 
 ## Como Funcionam as Threads para Clientes
