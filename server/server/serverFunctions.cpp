@@ -22,6 +22,11 @@ void Server::ExecuteCommand(string message, User *clientUser)
         helpCommand(clientUser);
         return;
     }
+    else if (isCommand(message, "/userlist"))
+    {
+        sendUserList(clientUser);
+        return;
+    }
     else if (isCommand(message, "/setadmin"))
     {
         setAdminCommand(usernames.at(0), clientUser);
@@ -249,11 +254,29 @@ void Server::helpCommand(User *clientUser)
     this->SendSingleMessage(colorString("/changename <new_name> - Altera o nome de usuário\n"
                                         "/mute <username> - Muta um usuário\n"
                                         "/unmute <username> - Desmuta um usuário\n"
+                                        "/userlist - Mostra a lista de usuários\n"
+                                        "/setadmin <password> - Torna o usuário administrador\n"
                                         "/adminmute <username> - Muta um usuário para todos\n"
                                         "/adminunmute <username> - Desmuta um usuário para todos\n"
                                         "/help - Mostra os comandos disponíveis",
                                         yellow),
                             *clientUser);
+}
+
+/**
+ * Envia a lista de usuários para o cliente
+ * 
+ * @param clientUser Usuário que enviou o comando
+ */
+void Server::sendUserList(User *clientUser)
+{
+    string message = "Usuários conectados:";
+    for (auto user : users)
+    {
+        message += "\n" + user.getName();
+    }
+
+    this->SendSingleMessage(colorString(message, yellow), *clientUser);
 }
 
 /**

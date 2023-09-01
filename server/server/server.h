@@ -49,6 +49,7 @@ public:
     void unmuteUserCommand(string username, User *clientUser);
     void changeNameCommand(string newName, User *clientUser);
     void helpCommand(User *clientUser);
+    void sendUserList(User *clientUser);
     void setAdminCommand(string username, User *clientUser);
 
     User *getUserById(int id);
